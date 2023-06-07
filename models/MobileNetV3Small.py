@@ -8,10 +8,7 @@ from tensorflow.keras.layers import Dense, Flatten, BatchNormalization, Dropout,
 from tensorflow.keras.preprocessing import image_dataset_from_directory
 from tensorflow.keras.applications import MobileNetV3Small
 from keras.utils.vis_utils import plot_model
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, precision_score, recall_score
 import seaborn as sns
 # %% 
 train_dir = '../dataset/split/train'
@@ -73,9 +70,6 @@ model.add(GlobalAveragePooling2D())
 model.add(Flatten())
 model.add(Dense(32, activation='relu'))
 model.add(Dense(64, activation='relu'))
-# model.add(Dense(128, activation='relu'))
-# model.add(Dense(256, activation='relu'))
-# model.add(Dense(512, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 model.summary()
@@ -103,3 +97,28 @@ with open("../graph/MobileNet.txt", "w") as outfile:
 model.save(f'../saved_models/MobileNetV3Small.h5')
 # %%
 print(f'Test Loss: {test_loss} Test Accuracy: {test_acc}')
+# %%
+test_images = []
+test_labels = []
+for images, labels in test_data:
+    test_images.append(images.numpy())
+    test_labels.append(labels.numpy())
+test_images = np.concatenate(test_images)
+test_labels = np.concatenate(test_labels)
+
+# Get model predictions
+predictions = model.predict(test_images)
+predicted_labels = np.round(predictions).flatten()
+
+# Calculate confusion matrix"
+cm = confusion_matrix(test_labels, predicted_labels)
+print("Confusion Matrix:")
+print(cm)
+
+# Calculate precision
+precision = precision_score(test_labels, predicted_labels)
+print("Precision:", precision)
+
+# Calculate recall
+recall = recall_score(test_labels, predicted_labels)
+print("Recall:", recall)

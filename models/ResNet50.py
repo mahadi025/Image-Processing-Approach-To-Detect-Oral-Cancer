@@ -99,3 +99,28 @@ with open("../graph/ResNet.txt", "w") as outfile:
 model.save(f'../saved_models/ResNet.h5')
 # %%
 print(f'Test Loss: {test_loss} Test Accuracy: {test_acc}')
+# %%
+test_images = []
+test_labels = []
+for images, labels in test_data:
+    test_images.append(images.numpy())
+    test_labels.append(labels.numpy())
+test_images = np.concatenate(test_images)
+test_labels = np.concatenate(test_labels)
+
+# Get model predictions
+predictions = model.predict(test_images)
+predicted_labels = np.round(predictions).flatten()
+
+# Calculate confusion matrix"
+cm = confusion_matrix(test_labels, predicted_labels)
+print("Confusion Matrix:")
+print(cm)
+
+# Calculate precision
+precision = precision_score(test_labels, predicted_labels)
+print("Precision:", precision)
+
+# Calculate recall
+recall = recall_score(test_labels, predicted_labels)
+print("Recall:", recall)
